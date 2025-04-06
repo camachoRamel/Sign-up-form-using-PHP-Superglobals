@@ -1,13 +1,36 @@
 <?php
+    session_start();
 
-$log = [];
+    $isRegistrationSuccessful = $hasUser = $hasEmail = false;
+    $username = $email = $password = $confirm_password = $age = $gender = null;
+    if(isset($_SESSION['user'])){
+        $hasUser = true;
+    }
 
-if($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['submit'])){
-    
+    if(isset($_COOKIE['email'])){
+        $hasEmail = true;
+    }
 
-    
-}
+    if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])){
+        $username = htmlspecialchars($_POST['username']);
+        $email = htmlspecialchars($_POST['email']);
+        $password = passwordChecker(htmlspecialchars($_POST['password']), htmlspecialchars($_POST['confirm_password']));
+        $age = htmlspecialchars($_POST['age']);
+        $gender = htmlspecialchars($_POST['gender']);
+        setcookie('email', $email);
+        $_SESSION['user'] = $username;
 
+        $isRegistrationSuccessful = true;
+        $hasUser = true;
+    }
+
+
+    function passwordChecker(string $password, string $confirm_password){
+        if($password == $confirm_password){
+            return true;
+        }
+        return false;
+    }
 
 ?>
 
@@ -44,7 +67,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['submit'])){
                 </div>
                 <div class="form-group">
                     <label class="font-weight-bold" for="confirm-password">Confirim Password:</label>
-                    <input class="form-control" type="password" name="confirm-password" required>
+                    <input class="form-control" type="password" name="confirm_password" required>
                 </div>
                 <div class="form-group">
                     <label class="font-weight-bold" for="age">Age:</label>
@@ -66,14 +89,14 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['submit'])){
 
 
     <!-- REGISTRATION SUCCESSFUL -->
-    <div class="container rounded bg-white shadow mb-4">
-        <div class="container"><h2 class="font-weight-bold py-4">Registration Successful!</h2></div>
+    <div class="container rounded bg-white shadow mb-4 <?= $isRegistrationSuccessful ? "d-block" : "d-none"?>">
+        <div class="container"><h2 class="font-weight-bold pt-4">Registration Successful!</h2></div>
 
-        <div class="container">
-            <span class="d-block font-weight-bold">Username: <p class="d-inline font-weight-normal">THis is username</p></span>
-            <span class="d-block font-weight-bold">Email: <p class="d-inline font-weight-normal">Email</p></span>
-            <span class="d-block font-weight-bold">Age: <p class="d-inline font-weight-normal">Age</p></span>
-            <span class="d-block font-weight-bold">Gender: <p class="d-inline font-weight-normal">Gender</p></span>
+        <div class="container py-3">
+            <span class="d-block font-weight-bold">Username: <p class="d-inline font-weight-normal"><?= $username ?></p></span>
+            <span class="d-block font-weight-bold">Email: <p class="d-inline font-weight-normal"><?= $email ?></p></span>
+            <span class="d-block font-weight-bold">Age: <p class="d-inline font-weight-normal"><?= $age ?></p></span>
+            <span class="d-block font-weight-bold">Gender: <p class="d-inline font-weight-normal"><?= $gender ?></p></span>
             <span class="d-block font-weight-bold">Request Method: <p class="d-inline font-weight-normal"><?= $_SERVER['REQUEST_METHOD'] ?></p></span>
             <span class="d-block font-weight-bold">Script Name: <p class="d-inline font-weight-normal"><?= $_SERVER['PHP_SELF'] ?></p></span>
         </div>
@@ -81,13 +104,13 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['submit'])){
     </div>
 
     <!-- WELCOME USER -->
-    <div class="container mb-3">
-        <p class="text-center">Welcome back, <span class="d-inline font-weight-bold">User</span></p>
+    <div class="container mb-3 <?= $hasUser ? "d-block" : "d-none" ?>">
+        <p class="text-center">Welcome back, <span class="d-inline font-weight-bold"><?= $_SESSION['user'] ?></span></p>
     </div>
 
     <!-- LAST USED EMAIL -->
-    <div class="container mb-3">
-        <p class="text-center">Your last used email, <span class="d-inline font-weight-bold">Email</span></p>
+    <div class="container mb-3 <?= $hasEmail ? "d-block" : "d-none" ?>">
+        <p class="text-center">Your last used email, <span class="d-inline font-weight-bold"><?= $_COOKIE['email'] ?></span></p>
     </div>
 
 </body>
